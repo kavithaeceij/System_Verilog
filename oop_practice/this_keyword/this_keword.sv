@@ -1,0 +1,67 @@
+// -------------------------------------------------
+// Class definition
+// -------------------------------------------------
+class student;
+
+  // -------------------------------------------------
+  // Class properties (data members)
+  // These belong to the object
+  // -------------------------------------------------
+  int id;
+  int marks;
+
+  // -------------------------------------------------
+  // Class method (function)
+  // This method receives values as arguments
+  // and assigns them to the object properties
+  // -------------------------------------------------
+  function void student_grade(int id, int marks);
+
+    // 'id' and 'marks' on the RIGHT side are
+    // function arguments (temporary variables)
+    //
+    // 'this.id' and 'this.marks' on the LEFT side
+    // are the object properties
+    //
+    // 'this' refers to the current object
+    this.id    = id;//check without this --then it prints 0 value
+    this.marks = marks;
+
+    // Displaying the argument values
+    // (At this point, argument values and object
+    //  values are the same)
+    $display("ID=%0d MARKS=%0d", id, marks);
+
+  endfunction : student_grade
+
+endclass : student
+
+
+// -------------------------------------------------
+// Test module
+// -------------------------------------------------
+module check_score;
+
+  // Class handle declaration
+  // No object is created yet
+  student s1;
+
+  initial begin
+
+    // -------------------------------------------------
+    // Create the object using new()
+    // Memory is allocated at runtime
+    // -------------------------------------------------
+    s1 = new();
+
+    // -------------------------------------------------
+    // Call the class method and pass values
+    // 50 and 100 become function arguments
+    // -------------------------------------------------
+    s1.student_grade(50, 100);
+
+    // Message from outside the class
+    $display("Outside class Id=%0d MARKS=%0d",s1.id,s1.marks);
+  end
+
+endmodule : check_score
