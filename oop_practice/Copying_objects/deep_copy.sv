@@ -1,0 +1,104 @@
+// Inner class representing error information
+class error_trans;
+  bit [31:0] err_data;  // error data
+  bit error;             // error flag
+  
+  // Constructor to initialize error fields
+  function new(bit [31:0] err_data, bit error);
+    this.err_data = err_data; // assign input to class variable
+    this.error = error;
+  endfunction
+endclass
+
+
+// Outer class representing a transaction
+class transaction;
+  bit [31:0] data;      // normal variable
+  int id;               // normal variable
+  error_trans err_tr;   // inner class object (handle)
+  
+  // Constructor
+  function new();
+    data = 100;                         // initialize data
+    id = 1;                             // initialize id
+    err_tr = new(32'hFFFF_FFFF, 1);     // create inner object
+  endfunction
+  
+  // Display method to print transaction contents
+  function void display();
+    $display("transaction: data = %0d, id = %0d", data, id);
+    $display("error_trans: err_data = %0h, error = %0d\n",
+             err_tr.err_data, err_tr.error);
+  endfunction
+  
+  // Deep copy function
+  function deep_copy(transaction tr);
+    // 'this' refers to destination object (tr2)
+    // 'tr' refers to source object (tr1)
+
+    this.data = tr.data;                     // copy normal variable
+    this.id = tr.id;                         // copy normal variable
+
+    // copy inner object values (not handle)
+    this.err_tr.err_data = tr.err_tr.err_data;
+    this.err_tr.error = tr.err_tr.error;
+  endfunction
+endclass
+
+
+// Test module
+module deep_copy_example;
+  transaction tr1, tr2;
+  
+  initial begin
+    // Step 1: create first transaction
+    tr1 = new();
+    $display("Calling display method using tr1");
+    tr1.display();
+    
+    // Step 2: create second transaction
+    tr2 = new();
+    
+    // Step 3: deep copy values from tr1 to tr2
+    // tr2 is destination, tr1 is source
+    tr2.deep_copy(tr1);
+
+    $display("After deep copy tr1 --> tr2");
+    $display("Calling display method using tr2");
+    tr2.display();
+    $display("--------------------------------");
+    
+    // Step 4: modify tr1 values
+    tr1.data = 200;
+    tr1.id = 2;
+    tr1.err_tr.err_data = 32'h1234;
+    tr1.err_tr.error = 0;
+    
+    // Step 5: display both objects
+    // tr2 should remain unchanged (deep copy behavior)
+    $display("Calling display method using tr1");
+    tr1.display();
+
+    $display("Calling display method using tr2");
+    tr2.display();
+    
+  end
+endmodule
+/*
+Calling display method using tr1
+transaction: data = 100, id = 1
+error_trans: err_data = ffffffff, error = 1
+
+After deep copy tr1 --> tr2
+Calling display method using tr2
+transaction: data = 100, id = 1
+error_trans: err_data = ffffffff, error = 1
+
+--------------------------------
+Calling display method using tr1
+transaction: data = 200, id = 2
+error_trans: err_data = 1234, error = 0
+
+Calling display method using tr2
+transaction: data = 100, id = 1
+error_trans: err_data = ffffffff, error = 1*/
